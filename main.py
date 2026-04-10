@@ -14,14 +14,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# Middleware to add CORS headers to all responses
 @app.middleware("http")
 async def add_cors_header(request: Request, call_next):
     response = await call_next(request)
     response.headers["access-control-allow-origin"] = "*"
     return response
 
-
+# Endpoint to classify a name using the Genderize API
 @app.get("/api/classify")
 async def classify(request: Request, name: Optional[str] = Query(default=None)):
     # Return 422 if name was passed as an array type
