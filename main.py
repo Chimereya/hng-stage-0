@@ -27,7 +27,8 @@ async def add_cors_header(request: Request, call_next):
 async def classify(request: Request, name: Optional[str] = Query(default=None)):
     # Return 422 if name was passed as an array type
     raw_params = str(request.url.query)
-    if "name[]" in raw_params:
+
+    if "name[]" in raw_params or "name%5B%5D" in raw_params:
         return JSONResponse(
             status_code=422,
             content={"status": "error", "message": "name is not a string"}
