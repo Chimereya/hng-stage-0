@@ -54,8 +54,9 @@ It processes the response and returns a structured output with confidence evalua
 1. **Clone the repository**
 ```bash
 git clone https://github.com/Chimereya/hng-stage-0.git
-```
 cd hng-stage-0
+```
+
 
 
 2. **Install dependencies**
