@@ -74,7 +74,7 @@ async def test_no_prediction_edge_case(client, respx_mock):
     respx_mock.get(GENDERIZE_URL).mock(
         return_value=httpx.Response(
             200,
-            json={"name": "unknown", "gender": None, "probability": 0.0, "count": 0}
+            json={"name": "unknown", "gender": None, "probability": 0.0, "sample_size": 0}
         )
     )
 

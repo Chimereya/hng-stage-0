@@ -81,7 +81,7 @@ async def classify(request: Request, name: Optional[str] = Query(default=None)):
                 "name": data["name"],
                 "gender": data["gender"],
                 "probability": data["probability"],
-                "count": data["count"],
+                "sample_size": data["count"],
                 "is_confident": is_confident,
                 "processed_at": datetime.now(timezone.utc).isoformat(),
             }
