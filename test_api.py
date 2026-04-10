@@ -59,7 +59,7 @@ async def test_missing_name_param(client):
 async def test_empty_name(client):
     response = await client.get("/api/classify?name=   ")
     assert response.status_code == 400
-    assert response.json()["message"] == "Missing or empty name"
+    assert response.json()["message"] == "Missing or empty name parameter"
 
 
 @pytest.mark.asyncio
