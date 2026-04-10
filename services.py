@@ -1,13 +1,11 @@
 import httpx
 from datetime import datetime, timezone
+from fastapi.responses import JSONResponse
 
 GENDERIZE_URL = "https://api.genderize.io"
+
 
 # Service function to classify a name using the Genderize API
-import httpx
-from datetime import datetime, timezone
-
-GENDERIZE_URL = "https://api.genderize.io"
 
 async def classify_name(name: str):
     async with httpx.AsyncClient(timeout=10.0) as client:
@@ -30,11 +28,14 @@ async def classify_name(name: str):
             prob = data.get("probability", 0.0)
 
             # Handle names not found
-            if not gender or count == 0:
-                return {
-                    "error": "No prediction available", 
-                    "code": 200
-                }
+            if gender is None or count == 0:
+                return JSONResponse(
+                    status_code=404,
+                    content={
+                        "status": "error", 
+                        "message": "No prediction available for the provided name"
+                    }
+                )
 
             # Confidence Logic
             is_confident = (prob >= 0.7) and (count >= 100)
