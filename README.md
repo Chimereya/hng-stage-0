@@ -54,24 +54,24 @@ It processes the response and returns a structured output with confidence evalua
 1. **Clone the repository**
 ```bash
 git clone https://github.com/Chimereya/hng-stage-0.git
-
+```
 cd hng-stage-0
 
 
 2. **Install dependencies**
 ```bash
 pip install -r requirements.txt
-
+```
 
 3. **Run tests**
 ```bash
 pytest
-
+```
 
 4. **Run the application locally**
 ```bash
 uvicorn main:app --reload
-
+```
 
 
 
