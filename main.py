@@ -29,14 +29,14 @@ async def classify(request: Request, name: Optional[str] = Query(default=None)):
     if "name[]" in raw_params:
         return JSONResponse(
             status_code=422,
-            content={"status": "error", "message": "Invalid parameter type"}
+            content={"status": "error", "message": "name is not a string"}
         )
 
     # Return 400 if name is missing or blank
     if not name or not name.strip():
         return JSONResponse(
             status_code=400,
-            content={"status": "error", "message": "Missing or empty name"}
+            content={"status": "error", "message": "Missing or empty name parameter"}
         )
     
     # Calling the Genderize API to classify the name
@@ -46,10 +46,18 @@ async def classify(request: Request, name: Optional[str] = Query(default=None)):
                 "https://api.genderize.io",
                 params={"name": name.strip()}
             )
-        except Exception:
+        
+        # Catch network-level issues incase there's no internet
+        except (httpx.ConnectError, httpx.TimeoutException):
             return JSONResponse(
                 status_code=502,
-                content={"status": "error", "message": "External API unreachable"}
+                content={"status": "error", "message": "Upstream or server failure"}
+            )
+        # Catch any other unexpected exceptions
+        except Exception as e:
+            return JSONResponse(
+                status_code=500,
+                content={"status": "error", "message": f"Upstream or server failure: {str(e)}"}
             )
 
         # Handling when the external API returns a non-200 status code

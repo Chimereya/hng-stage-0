@@ -13,7 +13,7 @@ async def classify_name(name: str):
                 return {"error": "Rate limit exceeded. Try again later.", "code": 429}
             
             if response.status_code != 200:
-                return {"error": f"External API returned status {response.status_code}", "code": 502}
+                return {"error": f"Upstream or server failure  {response.status_code}", "code": 502}
             
             data = response.json()
 
@@ -22,7 +22,7 @@ async def classify_name(name: str):
         except httpx.TimeoutException:
             return {"error": "Classification service timed out.", "code": 504}
         except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}", "code": 500}
+            return {"error": f"Upstream or server failure: {str(e)}", "code": 500}
 
     # Extracting fields from the external API response
     gender = data.get("gender")
