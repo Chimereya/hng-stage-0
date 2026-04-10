@@ -2,6 +2,7 @@ import pytest
 import httpx
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from services import classify_name
 from main import app
 
 GENDERIZE_URL = "https://api.genderize.io"

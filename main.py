@@ -1,9 +1,10 @@
+from unittest import result
+
 from fastapi import FastAPI, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import Optional
-import httpx
-from datetime import datetime, timezone
+from services import classify_name
 
 app = FastAPI()
 
@@ -39,59 +40,20 @@ async def classify(request: Request, name: Optional[str] = Query(default=None)):
             content={"status": "error", "message": "Missing or empty name parameter"}
         )
     
-    # Calling the Genderize API to classify the name
-    async with httpx.AsyncClient() as client:
-        try:
-            resp = await client.get(
-                "https://api.genderize.io",
-                params={"name": name.strip()}
-            )
-        
-        # Catch network-level issues incase there's no internet
-        except (httpx.ConnectError, httpx.TimeoutException):
-            return JSONResponse(
-                status_code=502,
-                content={"status": "error", "message": "Upstream or server failure"}
-            )
-        # Catch any other unexpected exceptions
-        except Exception as e:
-            return JSONResponse(
-                status_code=500,
-                content={"status": "error", "message": f"Upstream or server failure: {str(e)}"}
-            )
+    # Call the service function to classify the name
+    result = await classify_name(name.strip())
 
-        # Handling when the external API returns a non-200 status code
-        if resp.status_code != 200:
-            return JSONResponse(
-                status_code=502,
-                content={"status": "error", "message": "External API error"}
-            )
-
-        data = resp.json()
-
-    # Handle null gender
-    if not data.get("gender"):
+    # Handling the errors from the service function
+    if "error" in result:
         return JSONResponse(
-            status_code=200,
-            content={"status": "error", "message": "No prediction available"}
+            status_code=result.get("code", 500),
+            content={
+                "status": "error",
+                "message": result["error"]
+            }
         )
 
-    is_confident = (
-        data.get("probability", 0) >= 0.90 and
-        data.get("count", 0) >= 100
-    )
-
-    return JSONResponse(
-        status_code=200,
-        content={
-            "status": "success",
-            "data": {
-                "name": data["name"],
-                "gender": data["gender"],
-                "probability": data["probability"],
-                "sample_size": data["count"],
-                "is_confident": is_confident,
-                "processed_at": datetime.now(timezone.utc).isoformat(),
-            }
-        }
-    )
+    return {
+        "status": "success",
+        "data": result
+    }
